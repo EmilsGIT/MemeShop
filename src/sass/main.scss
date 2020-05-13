@@ -1,0 +1,18 @@
+$colorz: (
+primary: #1976D2,
+secondary: #424242,
+white: #82B1FF,
+orange: #FF5252,
+darkgrey: #2196F3,
+complete: #4CAF50,
+inprogress: #FFC107,
+incomplete: #FFC107,
+lightgrey: #FFC107
+);
+
+@mixin infobox_mixin($border-radius, $border-color, $padding, $margin-bottom, $color) {
+    border: $border-radius solid $border-color;
+    padding: $padding;
+    margin-bottom: $margin-bottom;
+    color: $color;
+}
