@@ -19,11 +19,16 @@
    <v-text-field
  label="Price"
  required
+ type="number"
  v-model="Price"
  >
  </v-text-field>
+<v-file-input label="File input" @change="uploadImage"> </v-file-input>
+
+
  <v-btn color="green"
  @click="addNewMenuItem()"
+ :disabled="btnDisable"
  >
      Add Item
  </v-btn>
@@ -35,7 +40,7 @@
 
         </v-col>
         <v-col offset-md="1" md="4">
-                <h1>Basket</h1>
+                <h1>Preview</h1>
             <div class="pa-2" id="info">
                 <v-simple-table id="menu-table">
                     <thead>
@@ -65,23 +70,55 @@
 </template>
 
 <script>
-import { dbMenuAdd } from '../../firebase'
+import { dbMenuAdd, fb } from '../../firebase'
 
 export default {
     data () {
         return {
             Name: '',
             Description: '',
-            Price: ''
+            Price: '',
+            image: null,
+            btnDisable: true
 
         }
     },
     methods: {
+        uploadImage (e) {
+            let file = e;
+            console.log(file);
+            var storageRef = fb.storage().ref('products/'+ file.name);
+
+            let uploadTask = storageRef.put(file);
+            console.log(uploadTask)
+
+                uploadTask.on('state_changed', (snapshot) => {
+                    console.log(snapshot)
+                }, 
+                (error) => {
+                    console.log(error)
+                // Handle unsuccessful uploads
+                },  () => {
+                // Handle successful uploads on complete
+                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    this.image = downloadURL
+                    this.btnDisable = false;
+                    console.log('File available at', downloadURL);
+                    
+                });
+                });
+
+
+
+
+        },
         addNewMenuItem() {
             dbMenuAdd.add({
                 Name: this.Name,
                 Description: this.Description,
-                Price: this.Price
+                Price: this.Price,
+                image: this.image
             })
         }
     }

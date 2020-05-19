@@ -8,18 +8,23 @@
   <v-simple-table id="menu-table">
       <thead>
         <tr>
+          <th></th>
           <th class="text-left">Name of item</th>
           <th class="text-left">Price</th>
           <th class="text-left">add to basket</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in menuItems" :key="item.name">
-          <td>
-              <span id="td_name">{{ item.name }}</span><br>
-              <span id="menu_item_description">{{ item.description }}</span>
+        <tr v-for="item in menuItems" :key="item.Name">
+         
+          <td id="td_menuitem_img">
+            <v-img v-bind:src="item.image"></v-img>
           </td>
-          <td>{{ item.price }}</td>
+          <td>
+              <span id="td_name">{{ item.Name }}</span><br>
+              <span id="menu_item_description">{{ item.Description }}</span>
+          </td>
+          <td>{{ item.Price }}</td>
           <td>
               <v-btn @click="addToBasket(item)">
                   <v-icon color="green">add_box</v-icon>
@@ -44,14 +49,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in basket" :key="item.name">
+        <tr v-for="item in basket" :key="item.Name">
           <td>
               <v-icon color="green" @click="increaseQtn(item)">add_box</v-icon>
               {{ item.quantity }}
               <v-icon color="green" @click="decreaseQtn(item)">indeterminate_check_box</v-icon>
           </td>
-          <td>{{ item.name }}</td>
-          <td>{{item.price}}</td>
+          <td>{{ item.Name }}</td>
+          <td>{{item.Price}}</td>
         </tr>
       </tbody>
     
@@ -85,57 +90,24 @@
 </template>
 
 <script>
+
+import'firebase/firestore'
+import 'firebase/auth'
+
 import { dbMenuAdd } from '../firebase'
 export default {
     data () {
       return {
-          basketDump: [],
-        menuItems: [
-          /*
-          {
-            name: 'Frozen Yogurt',
-            description: "runescape stuff",
-            price: 159,
-          },
-          {
-            name: 'Ice cream sandwich',
-            description: "runescape stuff",
-            price: 237,
-          },
-          {
-            name: 'Eclair',
-            description: "runescape stuff",
-            price: 262,
-          },
-          {
-            name: 'Cupcake',
-            description: "runescape stuff",
-            price: 305,
-          },
-          {
-            name: 'Gingerbread',
-            description: "runescape stuff",
-            price: 356,
-          } */
-        ],
+          basketDump: [],      
       }
     },
-    created() {
-      dbMenuAdd.get().then((querySnapshot) => {
-        querySnapshot.forEach((doc => {
-         console.log(doc.id, " => ", doc.data());
-         var menuItemData = doc.data(); 
-         this.menuItems.push({
-           id: doc.id,
-           name: menuItemData.name,
-           description: menuItemData.description,
-           price: menuItemData.price
-         }) 
-        }))
-      })
+    beforeCreate() {
+      this.$store.dispatch('setMenuItems')
     },
     methods: {
         addToBasket(item) {
+          console.log(dbMenuAdd);
+          
 /*             if(this.basket.find(itemInArray => item.name === itemInArray.name)) {
                     item = this.basket.find(itemInArray => item.name === itemInArray.name);
                 this.increaseQtn(item);
@@ -148,8 +120,8 @@ export default {
                                      })
                  } */
                     this.basketDump.push({
-                    name: item.name,
-                    price: item.price,
+                    Name: item.Name,
+                    Price: item.Price,
                     quantity: 1
        }); 
         this.$store.commit('addBasketItems', this.basketDump); 
@@ -173,11 +145,14 @@ export default {
          // return this.$store.state.basketItems
          return this.$store.getters.getBasketItems
         },
+        menuItems() {
+          return this.$store.getters.getMenuItems
+        },
         subTotal () {
             var subCost = 0;
             for( var items in this.basket) {
                 var individualItem = this.basket[items];
-                subCost += individualItem.quantity * individualItem.price;
+                subCost += individualItem.quantity * individualItem.Price;
             }
             return subCost
         },
@@ -240,6 +215,12 @@ tr td {
     color: green;
     font-size: 13px;
 
+}
+
+#td_menuitem_img {
+  max-width: 40px;
+  max-width: 40px;
+  padding: 0;
 }
 
 #basket_checkout {

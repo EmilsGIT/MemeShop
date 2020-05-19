@@ -69,10 +69,10 @@
 </template>
 
 <script>
-/* import { db } from '../firebase'
-
-import firebase from 'firebase'
-import'firebase/firestore'
+/* import { db } from '../firebase' */
+import '../firebase'
+import firebase from 'firebase' 
+import 'firebase/firestore'
 import 'firebase/auth'
 import store from '../store/index.js'
 
@@ -82,7 +82,7 @@ firebase.auth().onAuthStateChanged(function(user) {
   } else {
     store.dispatch('setUser', null)
   }
-}); */
+}); 
  
 
 export default {
